@@ -1,20 +1,46 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { FIREBASE_AUTH } from './firebaseConfig';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import MainScreen from './screens/MainScreen';
+import Login from './screens/Login';
+import { User, onAuthStateChanged } from 'firebase/auth';
+
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() =>{
+    onAuthStateChanged(FIREBASE_AUTH, (user) =>{
+      setUser(user);
+    })
+  })
+
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <GestureHandlerRootView style={{flex: 1}}>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Login'>
+
+        {user ? 
+        (
+          <Stack.Screen name='Main' options={{headerShown: false}} component={MainScreen}/>
+
+        ) : 
+        (
+          <Stack.Screen name='Login' options={{headerShown: false}} component={Login}/>
+        )}
+
+        </Stack.Navigator>      
+    </NavigationContainer>
+    </GestureHandlerRootView>
+
+
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
