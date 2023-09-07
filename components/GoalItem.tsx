@@ -1,8 +1,11 @@
-import { View, Text, StyleSheet, Button, Pressable, Animated, I18nManager } from "react-native";
+import { Text, StyleSheet, I18nManager } from "react-native";
 import React from "react";
 import { GoalItemType } from "../Models/GoalItemType";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
+import Animated, { FadeIn, Layout, LightSpeedOutLeft } from 'react-native-reanimated';
+
+const AnimatedSwipeable = Animated.createAnimatedComponent(Swipeable);
 
 export default function GoalItem(props: {
   goal: GoalItemType;
@@ -15,10 +18,7 @@ export default function GoalItem(props: {
   }
 
 
-  const renderRightActions = (
-    _progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>
-  ) => {
+  const renderRightActions = () => {
     return (
       <RectButton style={styles.rightAction} onPress={deleteItem}>
         <FontAwesome name="trash" style={styles.actionIcon} />
@@ -27,15 +27,18 @@ export default function GoalItem(props: {
   };
 
   return (
-    <Swipeable
+    <AnimatedSwipeable
     friction={2}
     enableTrackpadTwoFingerGesture
     rightThreshold={40}
-    renderRightActions={renderRightActions}> 
-    <View style={styles.container}>
+    renderRightActions={renderRightActions} 
+    entering={FadeIn} 
+    exiting={LightSpeedOutLeft}
+    layout={Layout.stiffness(1)}> 
+    <Animated.View style={styles.container}>
       <Text style={styles.displayValue}>{props.goal.value}</Text>
-    </View>
-    </Swipeable>
+    </Animated.View>
+    </AnimatedSwipeable>
 
   );
 }
